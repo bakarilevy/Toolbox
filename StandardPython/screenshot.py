@@ -29,7 +29,8 @@ def screenshot(name="screenshot"):
     mem_dc.DeleteDC()
     win32gui.DeleteObject(screenshot.GetHandle())
 
-def run():
+def main():
+    # Add function to generate a random screenshot name UUID
     screenshot()
     with open('screenshot.bmp') as f:
         img = f.read()
