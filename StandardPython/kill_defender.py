@@ -8,6 +8,7 @@ import win32security
 DEBUG_PROCESS = win32process.DEBUG_PROCESS
 TOKEN_QUERY = win32security.TOKEN_QUERY
 TOKEN_ADJUST_PRIVILEGES = win32security.TOKEN_ADJUST_PRIVILEGES
+TOKEN_ALL_ACCESS = win32security.TOKEN_ALL_ACCESS
 SE_PRIVILEGE_ENABLED = win32security.SE_PRIVILEGE_ENABLED
 
 def enable_debug_privilege():
@@ -15,7 +16,7 @@ def enable_debug_privilege():
         current_process_handle = win32api.GetCurrentProcess()
         token = win32security.OpenProcessToken(current_process_handle, TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY)
         #priv_val = win32security.LookupPrivilegeValue(None, DEBUG_PROCESS)
-        debug_token = win32security.AdjustTokenPrivileges(token, 0, SE_PRIVILEGE_ENABLED)
+        debug_token = win32security.AdjustTokenPrivileges(token, 1, SE_PRIVILEGE_ENABLED)
         win32api.CloseHandle(debug_token)
 
 
@@ -43,8 +44,9 @@ def get_pid(process_name):
     pid = get_procid_from_name(process_name, processes)
     return pid
 
-def set_privilege():
-    
+def set_privilege_none(pid):
+    token = win32security.OpenProcessToken(pid, TOKEN_ALL_ACCESS)
+    win32security.AdjustTokenPrivileges(token, 1, None)
     pass
 
 def main():
