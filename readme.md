@@ -68,5 +68,3 @@ Compiling a python binary using nuitka is quite simple
 ```
 python -m nuitka --onefile windows.py
 ```
-
-## C Programming Language
