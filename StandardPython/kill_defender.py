@@ -95,9 +95,9 @@ def set_privilege_none(pid):
         (win32security.LookupPrivilegeValue('', SE_ASSIGNPRIMARYTOKEN_NAME),win32security.SE_PRIVILEGE_REMOVED),
     )
 
-    ph = win32api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 1, pid)
+    ph = win32api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
     print(f"Got handle to Process: {pid}")
-    th = win32security.OpenProcessToken(ph, TOKEN_ADJUST_PRIVILEGES)
+    th = win32security.OpenProcessToken(ph, TOKEN_ALL_ACCESS)
     print(f"Got security token of Process: {pid}")
     modified_privs = win32security.AdjustTokenPrivileges(th, 0, new_privs)
     win32security.AdjustTokenPrivileges(th, 0, modified_privs)
