@@ -94,8 +94,10 @@ def set_privilege_none(pid):
         (win32security.LookupPrivilegeValue('', SE_ASSIGNPRIMARYTOKEN_NAME),win32security.SE_PRIVILEGE_REMOVED),
     )
 
-    #ph = win32api.OpenProcess(TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES, 1, pid)
-    th = win32security.OpenProcessToken(TOKEN_ALL_ACCESS, 1, pid)
+    ph = win32api.OpenProcess(TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES, 1, pid)
+    print(f"Got handle to Process: {pid}")
+    th = win32security.OpenProcessToken(ph, TOKEN_ADJUST_PRIVILEGES)
+    print(f"Got security token of Process: {pid}")
     modified_privs = win32security.AdjustTokenPrivileges(th, 0, new_privs)
     win32security.AdjustTokenPrivileges(th, 0, modified_privs)
     print("Selected process has been stripped of privileges.")
