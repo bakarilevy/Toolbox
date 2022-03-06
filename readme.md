@@ -68,3 +68,12 @@ Compiling a python binary using nuitka is quite simple
 ```
 python -m nuitka --onefile windows.py
 ```
+
+## IronPython
+With pyc.py you can create console or Windows Assemblies from python scripts.
+Basic usage looks like this:
+```
+ipyc /out:myprogram.exe /main:mainfile.py /target.exe program.py support.py
+```
+
+The above will generate an assembly called myprogram.exe (/out) which is a console app (/target) and will execute the code in mainfile.py first (/main) and will also include code from program.py and support.py in the assembly.
