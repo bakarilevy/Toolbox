@@ -42,7 +42,7 @@ SE_REMOTE_SHUTDOWN_NAME           = "SeRemoteShutdownPrivilege"
 def enable_debug_privilege():
     new_privs = (
         (win32security.LookupPrivilegeValue('', SE_SECURITY_NAME),win32security.SE_PRIVILEGE_ENABLED),
-             (win32security.LookupPrivilegeValue('', SE_RESTORE_NAME),win32security.SE_PRIVILEGE_ENABLED),
+        (win32security.LookupPrivilegeValue('', SE_RESTORE_NAME),win32security.SE_PRIVILEGE_ENABLED),
     )
     ph = win32api.GetCurrentProcess()
     th = win32security.OpenProcessToken(ph, TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES)
@@ -76,7 +76,7 @@ def set_privilege_none(pid):
     pass
 
 def main():
-    pass
+    enable_debug_privilege()
 
 if __name__=="__main__":
     main()
