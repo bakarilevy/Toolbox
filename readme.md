@@ -66,7 +66,7 @@ route
 ## Python Programming Language
 Compiling a python binary using nuitka is quite simple
 ```
-python -m nuitka --onefile --windows-disable-console --windows-company-name=Microsoft --windows-product-version=0.0.1 windows.py
+python -m nuitka --onefile windows.py
 ```
 
 ## C Programming Language
