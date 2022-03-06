@@ -41,6 +41,7 @@ SE_REMOTE_SHUTDOWN_NAME           = "SeRemoteShutdownPrivilege"
 SE_IMPERSONATE_NAME               = "SeImpersonatePrivilege"
 
 SECURITY_MANDATORY_UNTRUSTED_RID  = 0x2010
+PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 
 
 def enable_debug_privilege():
@@ -94,7 +95,7 @@ def set_privilege_none(pid):
         (win32security.LookupPrivilegeValue('', SE_ASSIGNPRIMARYTOKEN_NAME),win32security.SE_PRIVILEGE_REMOVED),
     )
 
-    ph = win32api.OpenProcess(TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES, 1, pid)
+    ph = win32api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 1, pid)
     print(f"Got handle to Process: {pid}")
     th = win32security.OpenProcessToken(ph, TOKEN_ADJUST_PRIVILEGES)
     print(f"Got security token of Process: {pid}")
