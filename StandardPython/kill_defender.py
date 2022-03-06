@@ -58,10 +58,10 @@ def get_all_processes():
 
 def get_procid_from_name(processname, proc_list):
     for process in proc_list:
-        p_id = process.Handle
-        p_val = process.wmi_property("Caption").value()
-        if p_val == processname:
-            return p_id
+        proc_name = process.wmi_property("Caption").value
+        proc_id = process.wmi_property("ProcessID").value
+        if proc_name == processname:
+            return proc_id
         else:
             continue
 
