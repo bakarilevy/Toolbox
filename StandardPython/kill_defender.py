@@ -11,17 +11,43 @@ TOKEN_ADJUST_PRIVILEGES = win32security.TOKEN_ADJUST_PRIVILEGES
 TOKEN_ALL_ACCESS = win32security.TOKEN_ALL_ACCESS
 SE_PRIVILEGE_ENABLED = win32security.SE_PRIVILEGE_ENABLED
 
+# NT Defined Privileges
+
+SE_CREATE_TOKEN_NAME              = "SeCreateTokenPrivilege"
+SE_ASSIGNPRIMARYTOKEN_NAME        = "SeAssignPrimaryTokenPrivilege"
+SE_LOCK_MEMORY_NAME               = "SeLockMemoryPrivilege"
+SE_INCREASE_QUOTA_NAME            = "SeIncreaseQuotaPrivilege"
+SE_UNSOLICITED_INPUT_NAME         = "SeUnsolicitedInputPrivilege"
+SE_MACHINE_ACCOUNT_NAME           = "SeMachineAccountPrivilege"
+SE_TCB_NAME                       = "SeTcbPrivilege"
+SE_SECURITY_NAME                  = "SeSecurityPrivilege"
+SE_TAKE_OWNERSHIP_NAME            = "SeTakeOwnershipPrivilege"
+SE_LOAD_DRIVER_NAME               = "SeLoadDriverPrivilege"
+SE_SYSTEM_PROFILE_NAME            = "SeSystemProfilePrivilege"
+SE_SYSTEMTIME_NAME                = "SeSystemtimePrivilege"
+SE_PROF_SINGLE_PROCESS_NAME       = "SeProfileSingleProcessPrivilege"
+SE_INC_BASE_PRIORITY_NAME         = "SeIncreaseBasePriorityPrivilege"
+SE_CREATE_PAGEFILE_NAME           = "SeCreatePagefilePrivilege"
+SE_CREATE_PERMANENT_NAME          = "SeCreatePermanentPrivilege"
+SE_BACKUP_NAME                    = "SeBackupPrivilege"
+SE_RESTORE_NAME                   = "SeRestorePrivilege"
+SE_SHUTDOWN_NAME                  = "SeShutdownPrivilege"
+SE_DEBUG_NAME                     = "SeDebugPrivilege"
+SE_AUDIT_NAME                     = "SeAuditPrivilege"
+SE_SYSTEM_ENVIRONMENT_NAME        = "SeSystemEnvironmentPrivilege"
+SE_CHANGE_NOTIFY_NAME             = "SeChangeNotifyPrivilege"
+SE_REMOTE_SHUTDOWN_NAME           = "SeRemoteShutdownPrivilege"
+
+
 def enable_debug_privilege():
-    try:
-        current_process_handle = win32api.GetCurrentProcess()
-        token = win32security.OpenProcessToken(current_process_handle, TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY)
-        #priv_val = win32security.LookupPrivilegeValue(None, DEBUG_PROCESS)
-        debug_token = win32security.AdjustTokenPrivileges(token, 1, SE_PRIVILEGE_ENABLED)
-        win32api.CloseHandle(debug_token)
-
-
-    except Exception as e:
-        print(e)
+    new_privs = (
+        (win32security.LookupPrivilegeValue("", SE_SECURITY_NAME, SE_PRIVILEGE_ENABLED)),
+        (win32security.LookupPrivilegeValue("", SE_RESTORE_NAME, SE_PRIVILEGE_ENABLED)),
+    )
+    ph = win32api.GetCurrentProcess()
+    th = win32security.OpenProcessToken(ph, TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES)
+    modified_privs = win32security.AdjustTokenPrivileges(th, 0, new_privs)
+    win32security.AdjustTokenPrivileges(th, 0, modified_privs)
 
 def get_all_processes():
     c = wmi.WMI(find_classes=False)

@@ -63,6 +63,8 @@ Displays routing table along with default gateway.
 route
 ```
 
+You can try to kill the Windows Defender process MsMpEng.exe
+
 ## Python Programming Language
 Compiling a python binary using nuitka is quite simple
 ```
