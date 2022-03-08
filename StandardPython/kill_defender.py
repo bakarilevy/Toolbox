@@ -48,9 +48,8 @@ def adjust_privilege(priv, enable=1):
     # Get the process token
     flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
     htoken = win32security.OpenProcessToken(win32api.GetCurrentProcess(), flags)
-    # Get the ID for system shutdown priv
+    # Get the ID for specified privilege
     id = win32security.LookupPrivilegeValue(None, priv)
-    # Obtain the privilege for this process
     # Create a list of privileges to be added
     if enable:
         new_privileges = [(id, SE_PRIVILEGE_ENABLED)]
