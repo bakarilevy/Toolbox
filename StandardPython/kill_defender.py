@@ -44,6 +44,21 @@ SECURITY_MANDATORY_UNTRUSTED_RID  = 0x2010
 PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 
 
+def adjust_privilege(priv, enable=1):
+    # Get the process token
+    flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+    htoken = win32security.OpenProcessToken(win32api.GetCurrentProcess(), flags)
+    # Get the ID for system shutdown priv
+    id = win32security.LookupPrivilegeValue(None, priv)
+    # Obtain the privilege for this process
+    # Create a list of privileges to be added
+    if enable:
+        new_privileges = [(id, SE_PRIVILEGE_ENABLED)]
+    else:
+        new_privileges = [(id, 0)]
+    # Make the adjustment
+    win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
+
 def enable_debug_privilege():
     new_privs = (
         (win32security.LookupPrivilegeValue('', SE_DEBUG_NAME),win32security.SE_PRIVILEGE_ENABLED),

@@ -65,7 +65,7 @@ route
 
 You can try to kill the Windows Defender process MsMpEng.exe
 
-## Python Programming Language
+## StandardPython
 Compiling a python binary using nuitka is quite simple
 ```
 python -m nuitka --onefile windows.py
