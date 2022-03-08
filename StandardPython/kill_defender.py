@@ -59,6 +59,12 @@ def adjust_privilege(priv, enable=1):
     # Make the adjustment
     win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
 
+def add_priv_example():
+    adjust_privilege(SE_SHUTDOWN_NAME)
+
+def rem_priv_example():
+    adjust_privilege(SE_SHUTDOWN_NAME, 0)
+
 def enable_debug_privilege():
     new_privs = (
         (win32security.LookupPrivilegeValue('', SE_DEBUG_NAME),win32security.SE_PRIVILEGE_ENABLED),
