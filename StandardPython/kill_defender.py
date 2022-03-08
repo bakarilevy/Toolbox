@@ -44,7 +44,7 @@ SECURITY_MANDATORY_UNTRUSTED_RID  = 0x2010
 PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 
 
-def adjust_privilege(priv, enable=1):
+def adjust_privilege_a(priv, enable=1):
     # Get the process token
     flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
     htoken = win32security.OpenProcessToken(win32api.GetCurrentProcess(), flags)
@@ -58,22 +58,23 @@ def adjust_privilege(priv, enable=1):
     # Make the adjustment
     win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
 
-def add_priv_example():
-    adjust_privilege(SE_SHUTDOWN_NAME)
-
-def rem_priv_example():
-    adjust_privilege(SE_SHUTDOWN_NAME, 0)
+def adjust_privilege_b(priv, pid, enable=1):
+    # Get the process token
+    flags = TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY
+    proc_handle = win32security.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
+    htoken = win32security.OpenProcessToken(proc_handle, flags)
+    # Get the ID for specified privilege
+    id = win32security.LookupPrivilegeValue(None, priv)
+    # Create a list of privileges to be added
+    if enable:
+        new_privileges = [(id, SE_PRIVILEGE_ENABLED)]
+    else:
+        new_privileges = [(id, 0)]
+    # Make the adjustment
+    win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
 
 def enable_debug_privilege():
-    new_privs = (
-        (win32security.LookupPrivilegeValue('', SE_DEBUG_NAME),win32security.SE_PRIVILEGE_ENABLED),
-        (win32security.LookupPrivilegeValue('', SE_CHANGE_NOTIFY_NAME),win32security.SE_PRIVILEGE_ENABLED),
-    )
-    ph = win32api.GetCurrentProcess()
-    th = win32security.OpenProcessToken(ph, TOKEN_ALL_ACCESS|TOKEN_ADJUST_PRIVILEGES)
-    modified_privs = win32security.AdjustTokenPrivileges(th, 0, new_privs)
-    win32security.AdjustTokenPrivileges(th, 0, modified_privs)
-    print("Debug privileges have been enabled!")
+    adjust_privilege_a(SE_DEBUG_NAME)
 
 def get_all_processes():
     c = wmi.WMI(find_classes=False)
