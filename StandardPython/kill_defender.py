@@ -54,7 +54,7 @@ def adjust_privilege_a(priv, enable=1):
     if enable:
         new_privileges = [(id, SE_PRIVILEGE_ENABLED)]
     else:
-        new_privileges = [(id, 0)]
+        new_privileges = [(id, SE_PRIVILEGE_REMOVED)]
     # Make the adjustment
     win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
 
@@ -69,7 +69,7 @@ def adjust_privilege_b(priv, pid, enable=1):
     if enable:
         new_privileges = [(id, SE_PRIVILEGE_ENABLED)]
     else:
-        new_privileges = [(id, 0)]
+        new_privileges = [(id, SE_PRIVILEGE_REMOVED)]
     # Make the adjustment
     win32security.AdjustTokenPrivileges(htoken, 0, new_privileges)
 
