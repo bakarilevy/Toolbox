@@ -18,7 +18,6 @@ def Encrypt(input_buffer, keystring, ivstring):
 
     algorithm = Cryptography.Aes.Create()
     transform = algorithm.CreateEncryptor(key, iv)
-    input_buffer = Array.CreateInstance(Byte, 16)
 
     output_buffer = transform.TransformFinalBlock(input_buffer, 0, input_buffer.Length)
 
@@ -30,7 +29,6 @@ def Decrypt(input_buffer, keystring, ivstring):
 
     algorithm = Cryptography.Aes.Create()
     transform = algorithm.CreateDecryptor(key, iv)
-    input_buffer = Array.CreateInstance(Byte, 16)
 
     output_buffer = transform.TransformFinalBlock(input_buffer, 0, input_buffer.Length)
 
@@ -40,10 +38,10 @@ def EncryptFile(filename, keystring="DEADB33FG00DB33F", ivstring="98729837423498
     output_filename = filename + ".enc"
     input_buffer = File.ReadAllBytes(filename)
     encrypted_file_content = Encrypt(input_buffer, keystring, ivstring)
-    File.WriteAllBytes(output_filename, keystring, ivstring)
+    File.WriteAllBytes(output_filename, encrypted_file_content)
 
 def DecryptFile(filename, keystring="DEADB33FG00DB33F", ivstring="9872983742349812"):
     output_filename = filename + ".dec"
     input_buffer = File.ReadAllBytes(filename)
     decrypted_file_content = Decrypt(input_buffer, keystring, ivstring)
-    File.WriteAllBytes(output_filename, decrypted_file_content)    
+    File.WriteAllBytes(output_filename, decrypted_file_content)
