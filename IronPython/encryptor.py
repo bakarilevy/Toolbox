@@ -11,8 +11,6 @@ from System.Security import Cryptography
 
 
 # Key and Variables must be 16 bytes in length
-keystring = "DEADB33FG00DB33F"
-ivstring = "9872983742349812"
 
 def Encrypt(input_buffer, keystring, ivstring):
     key = Text.Encoding.UTF8.GetBytes(keystring)
@@ -38,13 +36,13 @@ def Decrypt(input_buffer, keystring, ivstring):
 
     return output_buffer
 
-def EncryptFile(filename, keystring, ivstring):
+def EncryptFile(filename, keystring="DEADB33FG00DB33F", ivstring="9872983742349812"):
     output_filename = filename + ".enc"
     input_buffer = File.ReadAllBytes(filename)
     encrypted_file_content = Encrypt(input_buffer, keystring, ivstring)
     File.WriteAllBytes(output_filename, keystring, ivstring)
 
-def DecryptFile(filename, keystring, ivstring):
+def DecryptFile(filename, keystring="DEADB33FG00DB33F", ivstring="9872983742349812"):
     output_filename = filename + ".dec"
     input_buffer = File.ReadAllBytes(filename)
     decrypted_file_content = Decrypt(input_buffer, keystring, ivstring)
