@@ -158,3 +158,16 @@ namespace WindowsUtils
     }
 }
 ```
+
+Using the dotnet_assembly_compiler.py script you can load the above WindowsUtil class into memory:
+```py
+import clr
+assembly = Generate(source, "WindowsUtils", inMemory=True)
+clr.AddReference(assembly)
+from WindowsUtils import WindowsUtils
+```
+We can also do:
+```py
+assembly = Generate(source, "WindowsUtils", inMemory=True)
+WindowsUtils = assembly.WindowsUtils.WindowsUtils
+```
