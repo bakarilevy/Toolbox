@@ -172,6 +172,9 @@ assembly = Generate(source, "WindowsUtils", inMemory=True)
 WindowsUtils = assembly.WindowsUtils.WindowsUtils
 ```
 
+
+### Embedding IronPython
+
 To embed the IronPython Engine into a .NET assembly we need to include the 5 assemblies that come with it:
 
 - Microsoft.Scripting.dll
@@ -184,6 +187,8 @@ The first two assemblies are part of the Dynamic Language Runtime, the next two 
 The final assembly is used so that .NET projects using .NET 2.0 and 3.0 can use IronPython.
 It must be included in the project but does not need to be referenced.
 The main entrypoint for apps embedding IronPython is the Python class in the IronPython Hosting namespace.
+
+#### Embedding IronPython script into C# Portable Executable
 
 Setting up an IronPython engine in C#:
 ```c#
@@ -211,3 +216,51 @@ ScriptScope scope = engine.CreateScope();
 source.Execute(scope);
 ```
 
+We can also set the command line arguments for a script like this:
+```c#
+using IronPython.Runtime;
+
+List argList = new List();
+argList.extend(args);
+ScriptScope sys = Python.GetSysModule(engine);
+sys.SetVariable("argv", argList);
+```
+
+We will also need to set the module search path properly for import statements during embedding.
+```c#
+string filename = "program.py";
+string path = Assembly.GetExecutingAssembly().Location;
+string rootDir = Directory.GetParent(path).FullName;
+
+List<string> paths = new List<string>();
+paths.Add(rootDir);
+
+string path = Environment.GetEnvironmentVariable("IRONPYTHONPATH");
+if (path != null && path.Length > 0) {
+    string[] items = path.Split(";");
+    foreach (string p in items) 
+    {if (p.Length > 0) { paths.Add(p); }}
+}
+engine.SetSearchPaths(paths.ToArray());
+```
+
+Lets catch any exceptions from IronPython execution without it being fatal to the C# app:
+```c#
+try {
+    ScriptSource source;
+    source = engine.CreateScriptSourceFromFile(path);
+    int result = source.ExecuteProgram();
+    return result
+}
+
+catch (Exception e)
+{
+    ExceptionOperations eo = engine.GetService<ExceptionOperations>();
+    Console.Write(eo.FormatException(e));
+    return 1;
+}
+```
+
+#### Embedding IronPython as a scripting engine in C# Application
+
+Lets begin with getting and setting variables from a scope.
