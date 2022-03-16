@@ -79,3 +79,56 @@ ipyc /out:myprogram.exe /main:mainfile.py /target.exe program.py support.py
 ```
 
 The above will generate an assembly called myprogram.exe (/out) which is a console app (/target) and will execute the code in mainfile.py first (/main) and will also include code from program.py and support.py in the assembly.
+
+C# Class Library for IronPython example:
+```c#
+using System;
+using System.Collections;
+
+namespace PythonExtension
+{
+    public delegate int Callback(int input);
+
+    public class PythonClass : IEnumerable //This class implements IEnumerable
+    {
+        private int _value;
+        private Callback _callback;
+
+        public PythonClass(int value, Callback callback) // Constructor takes a callback value
+        {
+            _value = value;
+            _callback = callback;
+        }
+
+        public override string ToString() // Used for String representation
+        {
+            return String.Format("PythonClass<{0}>", _value);
+        }
+
+        public IEnumerator GetEnumerator() //Used for Iteration
+        {
+            for (int i = _value; i > 0; i--)
+            {
+                if (i % 2 == 0) {
+                    yield return callback(i);
+                }
+            }
+        }
+
+        public static PythonClass operator + (PythonClass a, PythonClass, b) // Operator Overloading for addition
+        {
+            return new PythonClass(a._value + b._value, a.callback);
+        }
+
+        public Object this[Object index] {
+            get {  // Equivalent of Python __getitem__
+                Console.WriteLine("Indexed with {0}", index);
+                return index;
+            }
+            set {  // Equivalent of Python __setitem__
+                Console.WriteLine("Index {0} set to {1}", index, value);
+            }
+        }
+    }
+}
+```
