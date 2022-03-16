@@ -171,3 +171,43 @@ We can also do:
 assembly = Generate(source, "WindowsUtils", inMemory=True)
 WindowsUtils = assembly.WindowsUtils.WindowsUtils
 ```
+
+To embed the IronPython Engine into a .NET assembly we need to include the 5 assemblies that come with it:
+
+- Microsoft.Scripting.dll
+- Microsoft.Scripting.Core.dll
+- IronPython.dll
+- IronPython.Modules.dll
+- Microsoft.Scripting.ExtensionAttribute.dll
+
+The first two assemblies are part of the Dynamic Language Runtime, the next two are part of IronPython.
+The final assembly is used so that .NET projects using .NET 2.0 and 3.0 can use IronPython.
+It must be included in the project but does not need to be referenced.
+The main entrypoint for apps embedding IronPython is the Python class in the IronPython Hosting namespace.
+
+Setting up an IronPython engine in C#:
+```c#
+using IronPython.Hosting;
+
+ScriptEngine engine = Python.CreateEngine();
+```
+The Dynamic Language Runtime supports creating multiple runtimes in a single application, allowing for context execution segmented
+from each other.
+We need to use both the ScriptSource and ScriptScope APIs from the Hosting API to run a python script.
+
+Execute IronPython code from a string in C#:
+```c#
+ScriptSource source;
+source = engine.CreateScriptFromString(sourceCode, SourceCodeKind.Statements);
+ScriptScope scope = engine.CreateScope();
+source.Execute(scope);
+```
+
+Execute IronPython code from a file in C#:
+```c#
+ScriptSource source;
+source = engine.CreateScriptFromFile(path);
+ScriptScope scope = engine.CreateScope();
+source.Execute(scope);
+```
+
