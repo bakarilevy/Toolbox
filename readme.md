@@ -65,6 +65,150 @@ route
 
 You can try to kill the Windows Defender process MsMpEng.exe
 
+## Infrastructure
+
+Using Nginx Web Server for standing up C2 infrastructure.
+Manual setup configuration is as follows...
+Install with the following commands:
+```
+sudo apt-get install -y nginx
+sudo vi /etc/nginx/conf.d/reverse.conf
+```
+See the example of reverse.conf in the Infrastructure directory for configuration.
+Once configured setup SSL certificates using Let's Encrypt:
+```
+add-apt-repository ppa:certbot/certbot
+apt-get update && apt-get install python-certbot-nginx
+sudo certbot --nginx -d mydomain.com -d www.mydomain.com
+```
+
+To setup Docker run the following:
+```
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+add-apt-repository "deb[arch=amd64] https://download.docker.com/ubuntu $(lsb_release -cs) stable"
+
+apt update
+apt install -y docker-ce
+```
+
+Once setup we can pull down Metasploit:
+```
+docker pull phocean/msf
+
+docker run --rm -it phocean/msf
+```
+
+--rm flag deletes the container on termination, and -it makes terminal interactive.
+
+Boot Up:
+```
+./msfconsole
+```
+
+We can tell Docker to map packets and folders from the host to the container:
+
+```
+sudo docker run --rm -it -p8400-8500:8400-8500 -v ~/.msf4:/root/.msf4 -v /tmp/msf:/tmp/data
+```
+
+An example Dockerfile for SILENTTRINITY can be seen in the infrastructure folder.
+
+And of course we can build our container:
+```
+docker build -t silent .
+```
+
+We can run the container in the background with the following:
+```
+docker run -d -v /opt/st:/root/st/data -p5000:5000
+```
+
+Using a Docker Hub account you can push your container image:
+```
+docker login
+
+docker tag <image-name> <username/repo-name>
+docker push <username/repo-name>
+```
+
+We can then docker pull our image to any machine with Docker installed!
+
+We can also dockerize the Nginx server for routing C2 traffic.
+With that done a one liner can be used to spin up the Nginx server.
+```
+docker run -d -p80:80 -p443:443 -e DOMAIN="www.somedomain.com" -e C2IP="192.168.1.29" -v /opt/letsencrypt:/etc/letsencrypt <username>/nginx
+```
+Keep in mind the DNS record for "somedomain.com" should point to the Nginx server's public IP.
+The SILENTRINITY and Metasploit containers can run on the same host however, Nginx must run on a different host.
+It is likely the first to get an IP ban.
+Anytime it goes down, running that command again we have a new domain and IP.
+It would be smart to purchase a couple of legit domains as well, one for user workstations, and one for servers.
+Ex: experienceyoufood.com V.S. linux-packets.org
+
+Lets automate the last piece of infrastructure setup.
+Acquire a credit card and get access to AWS.
+On our bounce server lets intall Terraform executing the following:
+```
+wget https://releases.hashicorp.com/terraform/0.12.12/terraform_0.12.12_linux_amd64.zip
+
+unzip terraform_0.12.12_linux_amd64.zip
+
+chmod +x terraform
+```
+
+In the AWS IAM (User mangement service) we need to create a programmitic account
+and grant full access to EC2 operations.
+Don't forget to keep the AWS Access Key ID and the Secret Access Key!
+We will then install the awscli tool and store the credentials:
+```
+sudo apt install awscli
+
+aws configure
+AWS ACCESS KEY ID: <access-key-id>
+AWS SECRET ACCESS KEY: <secret-access-key>
+Default region name: eu-west-1
+
+mkdir infra && cd infra
+```
+We setup the main.tf and provider.tf
+Provider initializes the AWS connector, loads credentials, and assigns a default region.
+In Main we create a resource, which is an atomic unit of a cloud provider service.
+Be that a Server, SSH key, Firewall, etc. 
+The granularity depends on the service provider.
+Terraform spawns the server after we define the aws_instance as a resource.
+The "ami-0039c41a10b230acb" in our basic resource is an Amazon Machine Image identfied as an Ubuntu 18.04 server.
+Now we can initialize:
+```
+terraform init
+```
+We can then stage our changes and see the output in formatted json:
+```
+terraform fmt && terraform plan
+```
+If we are happy with our changes we can run:
+```
+terraform apply
+```
+This deploys the server to AWS.
+If we want to launch more servers we can simply add a count variable in main.tf
+```
+count = 10
+instance_type = "t2.micro"
+```
+
+After we apply our Terraform changes then we should be able to SSH into our new ec2 instances:
+```
+ssh -i .ssh/id_rsa ubuntu@<cloud-ip-addr>
+```
+And if we run:
+```
+docker ps
+```
+We should see that we have our image installed.
+
+The scaffold for our attack infrastructure is relatively complete, with this we can spin up new infrastructure in seconds.
+
 ## StandardPython
 Compiling a python binary using nuitka is quite simple
 ```
