@@ -408,3 +408,65 @@ catch (Exception e)
 #### Embedding IronPython as a scripting engine in C# Application
 
 Lets begin with getting and setting variables from a scope.
+
+Creating an execution scope C#:
+```c#
+public class Engine
+{
+    ScriptEngine _engine;
+    ScriptRuntime _runtime;
+    CompiledCode _code;
+    ScriptScope _scope;
+
+    //_runtime.LoadAssembly(typeof(String).Assembly);
+
+    public class Engine(string source)
+    {
+        _engine = Python.CreateEngine();
+        _runtime = engine.Runtime;
+        _scope = _engine.CreateScope();
+        _scope.SetVariable("__name__", "__main__");
+        
+        ScriptSource _script = _engine.CreateScriptFromString(source, SourceCodeKind.Statements);
+        _code = _script.Compile();
+    }
+
+    public bool Execute()
+    {
+        try
+        {
+            _code.Execute(_scope);
+            return true;
+        }
+        catch (Exception e)
+        {
+            ExceptionOperations eo = _engine.GetService<ExceptionOperations>();
+            Console.Write(eo.FormatException(e));
+            return false;
+        }
+    }
+
+    public void SetVariable(string name, object value)
+    {
+        _scope.SetVariable(name, value);
+    }
+
+    public bool TryGetVariable(string name, out result)
+    {
+        return _scope.TryGetVariable(name, out result);
+    }
+}
+```
+
+Retrieving embedded resource from an assembly:
+```c#
+static string GetSourceCode()
+{
+    Assembly assembly = Assembly.GetExecutingAssembly();
+    string name = "BasicEmbedding.source_code.py";
+    Stream stream = assembly.GetManifestResourceStream(name);
+    StreamReader textStreamReader = new StreamReader(stream);
+    return textStreamReader.ReadToEnd();
+}
+```
+
