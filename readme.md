@@ -224,6 +224,22 @@ ipyc /out:myprogram.exe /main:mainfile.py /target.exe program.py support.py
 
 The above will generate an assembly called myprogram.exe (/out) which is a console app (/target) and will execute the code in mainfile.py first (/main) and will also include code from program.py and support.py in the assembly.
 
+You can also perform static compilation of a .NET assembly using IronPython iteslf:
+```py
+import clr
+# Assembly Name, File names, Key Word Arguments
+clr.CompileModules("ipy_modules.dll", "module1.py", "module2.py")
+```
+
+Now we can import and use these modules:
+```py
+import clr
+clr.AddReference("ipy_modules.dll")
+import module1, module2
+```
+
+CompileModules also takes a keyword mainModules argument that specifies the python file that acts as the entry point for the application.
+
 C# Class Library for IronPython example:
 ```c#
 using System;
