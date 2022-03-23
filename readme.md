@@ -214,6 +214,16 @@ Compiling a python binary using nuitka is quite simple
 ```
 python -m nuitka --onefile windows.py
 ```
+To solve the error:
+```
+Nuitka-Scons:INFO: Backend C compiler: gcc (gcc).
+collect2: fatal error: ld terminated with signal 11 [Segmentation fault]                              
+compilation terminated. Error 1
+```
+Try running:
+```
+python3 -m nuitka --lto=no windows.py
+```
 
 ## IronPython
 With pyc.py you can create console or Windows Assemblies from python scripts.
