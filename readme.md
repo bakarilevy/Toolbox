@@ -226,10 +226,26 @@ python3 -m nuitka --lto=no windows.py
 ```
 
 ## IronPython
+
+Loading .NET Assemblies in memory from Powershell:
+```
+$directorypath = (Get-Item .).FullName
+$assemblypath = $directorypath + "\program.dll"
+$bytes = [System.IO.File]::ReadAllBytes($assemblypath)
+$assembly = [System.Reflection.Assembly]::Load($bytes)
+$entryPointMethod = $assembly.GetTypes().Where({ $_.Name -eq 'Program' }, 'First').GetMethod('Main', [Reflection.BindingFlags] 'Static, Public, NonPublic')
+$entryPointMethod.Invoke($null, (, [string[]] ($null)))
+```
+
 With pyc.py you can create console or Windows Assemblies from python scripts.
 Basic usage looks like this:
 ```
 ipyc /out:myprogram.exe /main:mainfile.py /target.exe program.py support.py
+```
+
+To create a standalone executable you will need to compile with the command:
+```
+ipyc /target:winexe /embed /standalone /main:program.py
 ```
 
 The above will generate an assembly called myprogram.exe (/out) which is a console app (/target) and will execute the code in mainfile.py first (/main) and will also include code from program.py and support.py in the assembly.
