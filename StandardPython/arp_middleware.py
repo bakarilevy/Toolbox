@@ -1,5 +1,6 @@
 #!/user/bin python3
 
+# Example run: sudo python3 arp_middleware.py -ip_range 192.168.1.0/24
 import os
 import sys
 import time
