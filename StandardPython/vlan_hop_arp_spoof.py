@@ -2,9 +2,9 @@ import time
 from scapy.all import sendp, ARP, Ether, Dot1Q
 
 
-iface = ""
-target_ip = "192.168.13.23"
-fake_ip = "192.168.13.5"
+iface = "Wi-Fi"
+target_ip = "192.168.1.3"
+fake_ip = "192.168.1.5"
 fake_mac = "c0:de:de:ad:be:ef"
 our_vlan = 1
 target_vlan = 2

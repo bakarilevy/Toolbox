@@ -3,7 +3,7 @@ from base64 import b64decode
 from scapy.all import sniff
 
 
-dev = "en1"
+dev = "Wi-Fi"
 
 def handle_packet(packet):
     tcp = packet.getlayer("TCP")
