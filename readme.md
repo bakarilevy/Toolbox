@@ -30,6 +30,53 @@ sublist3r -d <target.com>
 
 OWASP Amass can also be used.
 
+### Geoint
+geoguesser
+
+### Email Discovey
+Search plaforms:
+```
+hunter.io
+phonebook.cz
+clearbit (chrome only)
+```
+Email verification:
+```
+verifyemailaddress.io
+email-checker.net/validate
+```
+Don't underestimate "forgot passwords"
+
+### Password Discovery
+```
+dehashed
+weleakinfo
+leakcheck
+snusbase
+haveibeenpwned
+scylla.sh
+hashes.org
+```
+
+### Username Discovery
+```
+namechk.com
+```
+### Person Discovery
+```
+whitepages.com
+truepeoplesearch.com
+fastpeoplesearch.com
+thatsthem.com
+pimeye
+tineye
+```
+
+### Voter Records
+```
+voterrecords.com
+```
+
 ## Networking Commands
 
 Shows your different interface types and IP addresses associated with them.
@@ -64,6 +111,45 @@ route
 ```
 
 You can try to kill the Windows Defender process MsMpEng.exe
+
+## Phishing
+
+- Gophish
+
+Username is admin password is gophish
+We will want to run the Gophish Framework on a cloud environment so we can resolve DNS requests to it rather than running it locally.
+We can use a platform like Digital Ocean, Heroku, or Oracle Cloud for this.
+We can use a site like freenom.com to get a free domain name, but its best to use a provider as close to your target as possible.
+After you have your domain, be sure to point it to the name servers of your cloud platform, IE on freenom you would need to point to the digital ocean nameservers if you were using both of those.
+
+```
+ns1.digitalocean.com
+ns2.digitalocean.com
+```
+For your VPS provider create a CNAME dns record for www (should be @ or hostname)
+
+It may take some time to propogate the domain name servers so maybe give it 24 hours to see if your phishing server is tied to your domain.
+To check your DNS and see what IP address it is using go to:
+```
+intodns.com/mydomain.us
+```
+
+On our VPS server we should install the screen package, after running the gophish binary we should run Ctrl-A and then D this should keep the process running detached even if we logout of the ssh session.
+
+Once you have your domain setup, you may need to find a way to allow your cloud provider to unlock your smtp server.
+
+The next thing we need is to set up an SSL certificate for our server so users can connect over https.
+
+If we go to zerossl.com we can get a free LetsEncrypt certificate.
+We will select the options DNS Verification and Accept Let's Encrypt SA.
+Make sure to download the CSR and account key.
+After we have generated these files and certificates, we will need to add some
+Domain TXT records on our VPS dashboard.
+
+After this we will download the domain certificate and key. Not the same as above.
+You will send these files to the phishing server and change the gophish config file to the appropriate path to the certificate and key files.
+
+We will also need an SMTP server that allows you to spoof such as SMTP to go.
 
 ## Infrastructure
 
