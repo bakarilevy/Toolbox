@@ -63,6 +63,11 @@ Displays routing table along with default gateway.
 route
 ```
 
+LM Hash for Pass the Hash attacks on Windows
+```
+aad3b435b51404eeaad3b435b51404ee
+```
+
 You can try to kill the Windows Defender process MsMpEng.exe
 
 ## Infrastructure
