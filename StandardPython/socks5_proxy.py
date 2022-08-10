@@ -96,7 +96,7 @@ class Proxy:
                 remote = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 remote.connect((address, port))
                 bind_address = remote.getsockname()
-                print(f"Connected to: {} on port: {}", address, port)
+                print(f"[*] Connected to: {address} on port: {port}")
             else:
                 connection.close()
             addr = int.from_bytes(socket.inet_aton(bind_address[0]), 'big', signed=False)
@@ -126,6 +126,7 @@ class Proxy:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((host, port))
         s.listen()
+        print(f"[*] SOCKS5 proxy server running on port {port}")
 
         while True:
             connection, address = s.accept()
