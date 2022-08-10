@@ -1,3 +1,4 @@
+import sys
 import socket
 import select
 import threading
@@ -128,11 +129,15 @@ class Proxy:
         s.listen()
         print(f"[*] SOCKS5 proxy server running on port {port}")
 
-        while True:
-            connection, address = s.accept()
-            print(f"[+] New connection received from: {address}")
-            t = threading.Thread(self.handle_client, args=(connection,))
-            t.start()
+        try:
+            while True:
+                connection, address = s.accept()
+                print(f"[+] New connection received from: {address}")
+                t = threading.Thread(self.handle_client, args=(connection,))
+                t.start()
+        except KeyboardInterrupt:
+            print("[*] SOCKS server exiting...")
+            sys.exit()
 
 if __name__=='__main__':
     proxy = Proxy("username", "password")
