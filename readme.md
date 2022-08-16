@@ -1,5 +1,7 @@
 # The Toolbox
 
+TODO : Experiment with Cython and the httpimport package to dynamically load syscall attacks at runtime
+
 - Recon
 - Enumeration
 - Exploitation
@@ -134,6 +136,54 @@ Try running:
 ```
 python3 -m nuitka --lto=no windows.py
 ```
+
+## Cython
+
+Experimenting with Cython for Win32 API
+
+In the example vector pyx:
+
+```py
+# distutils: language=c++
+
+
+from libcpp.vector cimport vector
+
+def primes(unsigned int nb_primes):
+    cdef int n, i
+    cdef vector[int] p
+    p.reserve(nb_primes) # Allocate memory for "nb_primes" elements
+    n = 2
+    while p.size() < nb_primes:
+        for i in p:
+            if n % i == 0:
+                break
+        else:
+            p.push_back(n)
+        n += 1
+    return p
+```
+The first line is a compiler directive that tells Cython to compile the code to C++, allowing us to make use of the standard library
+
+We can build this by running the setup.py:
+```py
+# python setup.py build_ext --inplace
+from setuptools import setup
+from Cython.Build import cythonize
+
+setup(
+    ext_modules = cythonize("vector.pyx", compiler_directives={"language_level" : 3})
+)
+
+```
+
+And import and use the module just like any other python module in main.py, keep in mind the built file has been renamed to vector.pyd:
+```py
+import vector
+
+print(vector.primes(20))
+```
+
 
 ## IronPython
 
@@ -421,4 +471,3 @@ static string GetSourceCode()
     return textStreamReader.ReadToEnd();
 }
 ```
-
