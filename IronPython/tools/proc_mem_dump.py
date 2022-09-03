@@ -53,7 +53,7 @@ def Dump(processHandle, processId, processName):
     try:
         filename = processName + "_" + str(processId) + ".dmp"
         fs = IO.FileStream(filename, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.Write)
-        status = NativeMethods.MiniDumpWriteDump(processHandle, processId, fs.SafeFileHandle, MINIDUMP_TYPE.MiniDumpNormal, System.IntPtr.Zero, System.IntPtr.Zero, System.IntPtr.Zero)
+        status = NativeMethods.MiniDumpWriteDump(processHandle, processId, fs.SafeFileHandle, MINIDUMP_TYPE.MiniDumpWithFullMemory, System.IntPtr.Zero, System.IntPtr.Zero, System.IntPtr.Zero)
         
         if status:
             print("Process was dumped successfully")

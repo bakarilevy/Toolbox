@@ -124,7 +124,7 @@ curl -x socks5://username:password@127.0.0.1:3000 https://httpbin.org/get
 ## StandardPython
 Compiling a python binary using nuitka is quite simple
 ```
-python -m nuitka --onefile windows.py
+python -m nuitka --windows-disable-console --onefile windows.py
 ```
 To solve the error:
 ```
